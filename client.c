@@ -173,6 +173,7 @@ int main(int argc, char *argv[]) {
             if (strncmp(code, "20", 2) == 0) {
                 printf("%s\n", basic_extract_json_response(resp));
             } else {
+                // TODO DACA NU ESTI IN BIBLIOTECA
                 printf("Eroare: Cartea nu exista.\n");
             }
 
@@ -183,14 +184,25 @@ int main(int argc, char *argv[]) {
             char publisher[100];
             char page_count[100];
 
+            char enter[2];
+            fgets(enter, 2, stdin);
+
             printf("title=");
-            fgets("%s", title, stdin);
+            fgets(title, 100, stdin);
+            title[strlen(title) - 1] = '\0';
+
             printf("author=");
-            fgets("%s", author, stdin);
+            fgets(author, 100, stdin);
+            author[strlen(author) - 1] = '\0';
+
             printf("genre=");
-            fgets("%s", genre, stdin);
+            fgets(genre, 100, stdin);
+            genre[strlen(genre) - 1] = '\0';
+
             printf("publisher=");
-            fgets("%s", publisher, stdin);
+            fgets(publisher, 100, stdin);
+            publisher[strlen(publisher) - 1] = '\0';
+
             printf("page_count=");
             scanf("%s", page_count);
 
@@ -215,51 +227,89 @@ int main(int argc, char *argv[]) {
             json_object_set_string(obj3, "author", author);
             json_object_set_string(obj3, "genre", genre);
             json_object_set_string(obj3, "publisher", publisher);
-            json_object_set_number(obj3, "page_count", (int)page_count);
+            json_object_set_number(obj3, "page_count", atoi(page_count));
 
             // Print JSON object
             char *serialized_string3 =
                 json_serialize_to_string_pretty(root_value3);
             printf("JSON Output:\n%s\n", serialized_string3);
+
+            // Ex 1.1: GET dummy from main server
+            sockfd =
+                open_connection("34.246.184.49", 8080, AF_INET, SOCK_STREAM, 0);
+            msg = compute_post_request(
+                "34.246.184.49", "/api/v1/tema/library/books",
+                "application/json", &serialized_string3, 1, NULL, 0, token);
+            send_to_server(sockfd, msg);
+            resp = receive_from_server(sockfd);
+            printf("%s\n", resp);
+
+            code = strstr(resp, "HTTP/1.1 ") + strlen("HTTP/1.1 ");
+
+            // succes
+            if (strncmp(code, "20", 2) == 0) {
+                printf("Carte adaugata cu succes!\n");
+            } else {
+                // TODO DACA NU ESTI IN BIBLIOTECA
+                printf("Eroare:\n");
+            }
+        } else if (strncmp("delete_book", task, strlen("delete_book")) == 0) {
+            char *id2 = malloc(10);
+            printf("id=");
+            scanf("%s", id2);
+            // TODO verifici daca id-ul e string si afisezi eroare
+            int id_valid2 = 1;
+            for (int i = 0; i < strlen(id2); ++i) {
+                if ('0' > id2[i] || '9' < id2[i]) {
+                    id_valid2 = 0;
+                }
+            }
+            if (!id_valid2) {
+                printf("Eroare: Id-ul contine caractere interzise.\n");
+                continue;
+            }
+
+            sockfd =
+                open_connection("34.246.184.49", 8080, AF_INET, SOCK_STREAM, 0);
+            char URL2[100] = "/api/v1/tema/library/books/";
+            strcat(URL2, id2);
+            msg = compute_delete_request("34.246.184.49", URL2, NULL, &cookie,
+                                         1, token);
+            send_to_server(sockfd, msg);
+            resp = receive_from_server(sockfd);
+            code = strstr(resp, "HTTP/1.1 ") + strlen("HTTP/1.1 ");
+
+            // succes
+            if (strncmp(code, "20", 2) == 0) {
+                // printf("%s\n", basic_extract_json_response(resp));
+                printf("Cartea cu id-ul %s a fost stearsa cu succes.\n", id2);
+            } else {
+                // TODO DACA NU ESTI IN BIBLIOTECA
+                printf("Eroare: Cartea cu id-ul %s nu exista.\n", id2);
+            }
+        } else if (strncmp("logout", task, strlen("logout")) == 0) {
+            // Ex 1.1: GET dummy from main server
+            sockfd =
+                open_connection("34.246.184.49", 8080, AF_INET, SOCK_STREAM, 0);
+            msg =
+                compute_get_request("34.246.184.49", "/api/v1/tema/auth/logout",
+                                    NULL, &cookie, 1, token);
+            send_to_server(sockfd, msg);
+            resp = receive_from_server(sockfd);
+
+            code = strstr(resp, "HTTP/1.1 ") + strlen("HTTP/1.1 ");
+            // succes
+            if (strncmp(code, "20", 2) == 0) {
+                token = NULL;
+                cookie = NULL;
+                printf("Utilizatorul s-a delogat cu succes!\n");
+            } else {
+                printf("Eroare: Delogare nereusita.\n");
+            }
+        } else if (strncmp("exit", task, strlen("exit")) == 0) {
+            close(sockfd);
+            break;
         }
-        // // Ex 1.2: POST dummy and print response from main server
-        // char **data = calloc(1, sizeof(char *));
-        // data[0] = calloc(100, sizeof(char));
-        // strcpy(data[0], "test&dummy");
-        // msg = compute_post_request("34.246.184.49", "/api/v1/dummy",
-        //                            "application/x-www-form-urlencoded",
-        //                            data, 1, NULL, 0);
-        // send_to_server(sockfd, msg);
-        // resp = receive_from_server(sockfd);
-        // printf("%s\n", resp);
-
-        // // Ex 2: Login into main server
-        // char **data2 = calloc(2, sizeof(char *));
-        // data2[0] = calloc(100, sizeof(char));
-        // data2[1] = calloc(100, sizeof(char));
-        // strcpy(data2[0], "username=student");
-        // strcpy(data2[1], "password=student");
-        // msg = compute_post_request("34.246.184.49", "/api/v1/auth/login",
-        //                            "application/x-www-form-urlencoded",
-        //                            data2, 2, NULL, 0);
-        // send_to_server(sockfd, msg);
-        // resp = receive_from_server(sockfd);
-        // printf("%s\n", resp);
-
-        // // Ex 3: GET weather key from main server
-        // int sockfd2 =
-        //     open_connection("82.196.7.246", 80, AF_INET, SOCK_STREAM, 0);
-        // char **cookies = calloc(1, sizeof(char *));
-        // cookies[0] = calloc(1000, sizeof(char));
-        // strcpy(cookies[0],
-        //        "connect.sid=s%3A8c0LVV6Nbuwi0cX0fhcw0xo7EAoeQr6L.TT%"
-        //        "2Fp1fPyCi6q6W09wayoKjrd%2FrYyTm3Gf299QRkmM9Y");
-        // msg = compute_get_request("82.196.7.246", "/api/v1/weather/key",
-        // NULL,
-        //                           cookies, 1);
-        // send_to_server(sockfd2, msg);
-        // resp = receive_from_server(sockfd2);
-        // printf("%s\n", resp);
     }
 
     return 0;
