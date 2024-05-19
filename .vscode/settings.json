@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "requests.h": "c",
+        "parson.h": "c"
+    }
+}
