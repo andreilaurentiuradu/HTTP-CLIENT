@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
                 "application/json", &serialized_string3, 1, NULL, 0, token);
             send_to_server(sockfd, msg);
             resp = receive_from_server(sockfd);
-            printf("%s\n", resp);
+            // printf("%s\n", resp);
 
             code = strstr(resp, "HTTP/1.1 ") + strlen("HTTP/1.1 ");
 
