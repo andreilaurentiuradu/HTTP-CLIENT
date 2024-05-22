@@ -15,8 +15,8 @@ char *compute_get_request(char *host, char *url, char *query_params,
                           char **cookies, int cookies_count, char *token) {
     char *message = calloc(BUFLEN, sizeof(char));
     char *line = calloc(LINELEN, sizeof(char));
-    // Step 1: write the method name, URL, request params (if any) and
-    // protocol type
+    // scriem tipul cererii, URL-ul, parametrii cererii (daca sunt) si tipul
+    // protocolului
     if (query_params != NULL) {
         sprintf(line, "GET %s?%s HTTP/1.1", url, query_params);
     } else {
@@ -25,11 +25,11 @@ char *compute_get_request(char *host, char *url, char *query_params,
 
     compute_message(message, line);
 
-    // Step 2: add the host
+    // adaugam hostul
     sprintf(line, "Host: %s", host);
     compute_message(message, line);
-    // Step 3 (optional): add headers and/or cookies, according to the
-    // protocol format
+
+    // adaugam headere si cookies
     if (cookies != NULL) {
         for (int i = 0; i < cookies_count; i++) {
             sprintf(line, "Cookie: %s", cookies[i]);
@@ -37,11 +37,12 @@ char *compute_get_request(char *host, char *url, char *query_params,
         }
     }
 
+    // adaugam tokenul
     if (token != NULL) {
         sprintf(line, "Authorization: Bearer %s", token);
         compute_message(message, line);
     }
-    // Step 4: add final new line
+    // enter la final
     compute_message(message, "");
     return message;
 }
@@ -50,8 +51,8 @@ char *compute_delete_request(char *host, char *url, char *query_params,
                              char **cookies, int cookies_count, char *token) {
     char *message = calloc(BUFLEN, sizeof(char));
     char *line = calloc(LINELEN, sizeof(char));
-    // Step 1: write the method name, URL, request params (if any) and
-    // protocol type
+    // scriem tipul cererii, URL-ul, parametrii cererii (daca sunt) si tipul
+    // protocolului
     if (query_params != NULL) {
         sprintf(line, "DELETE %s?%s HTTP/1.1", url, query_params);
     } else {
@@ -60,11 +61,11 @@ char *compute_delete_request(char *host, char *url, char *query_params,
 
     compute_message(message, line);
 
-    // Step 2: add the host
+    // adaugam hostul
     sprintf(line, "Host: %s", host);
     compute_message(message, line);
-    // Step 3 (optional): add headers and/or cookies, according to the
-    // protocol format
+
+    // adaugam headere si cookies
     if (cookies != NULL) {
         for (int i = 0; i < cookies_count; i++) {
             sprintf(line, "Cookie: %s", cookies[i]);
@@ -72,11 +73,13 @@ char *compute_delete_request(char *host, char *url, char *query_params,
         }
     }
 
+    // adaugam tokenul
     if (token != NULL) {
         sprintf(line, "Authorization: Bearer %s", token);
         compute_message(message, line);
     }
-    // Step 4: add final new line
+
+    // adaugam enter
     compute_message(message, "");
     return message;
 }
@@ -88,17 +91,15 @@ char *compute_post_request(char *host, char *url, char *content_type,
     char *line = calloc(LINELEN, sizeof(char));
     char *body_data_buffer = calloc(LINELEN, sizeof(char));
 
-    // Step 1: write the method name, URL and protocol type
+    // scriem numele metodei, URL-ul si tipul protocolului
     sprintf(line, "POST %s HTTP/1.1", url);
     compute_message(message, line);
 
-    // Step 2: add the host
+    // adaugam hostul
     sprintf(line, "Host: %s", host);
     compute_message(message, line);
-    /* Step 3: add necessary headers (Content-Type and Content-Length are
-       mandatory) in order to write Content-Length you must first compute the
-       message size
-    */
+
+    // adaugam date despre content
     sprintf(line, "Content-Type: %s", content_type);
     compute_message(message, line);
     int content_length = 0;
@@ -108,26 +109,27 @@ char *compute_post_request(char *host, char *url, char *content_type,
     if (body_data_fields_count > 1) {
         content_length += body_data_fields_count - 1;
     }
-    // int content_length = 10;
-    // printf("Content-Length: %d\n", content_length);
 
     sprintf(line, "Content-Length: %d", content_length);
     compute_message(message, line);
-    // Step 4 (optional): add cookies
+
+    // adaugam cookies
     if (cookies != NULL) {
         for (int i = 0; i < cookies_count; i++) {
             compute_message(message, cookies[i]);
         }
     }
 
+    // adaugam tokenul
     if (token != NULL) {
         sprintf(line, "Authorization: Bearer %s", token);
         compute_message(message, line);
     }
 
-    // Step 5: add new line at end of header
+    // adaugam enter
     compute_message(message, "");
-    // Step 6: add the actual payload data
+
+    // adaugam payloadul
     for (int i = 0; i < body_data_fields_count; i++) {
         strcat(body_data_buffer, body_data[i]);
         if (i != body_data_fields_count - 1) {

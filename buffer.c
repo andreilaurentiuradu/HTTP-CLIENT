@@ -1,7 +1,7 @@
 #include "buffer.h"
 
-buffer buffer_init(void)
-{
+// initializarea unui buffer
+buffer buffer_init(void) {
     buffer buffer;
 
     buffer.data = NULL;
@@ -10,8 +10,8 @@ buffer buffer_init(void)
     return buffer;
 }
 
-void buffer_destroy(buffer *buffer)
-{
+// distrugerea bufferului si eliberarea memoriei
+void buffer_destroy(buffer *buffer) {
     if (buffer->data != NULL) {
         free(buffer->data);
         buffer->data = NULL;
@@ -20,15 +20,14 @@ void buffer_destroy(buffer *buffer)
     buffer->size = 0;
 }
 
-int buffer_is_empty(buffer *buffer)
-{
-    return buffer->data == NULL;
-}
+// verificarea daca este gol
+int buffer_is_empty(buffer *buffer) { return buffer->data == NULL; }
 
-void buffer_add(buffer *buffer, const char *data, size_t data_size)
-{
+// adaugare in buffer
+void buffer_add(buffer *buffer, const char *data, size_t data_size) {
     if (buffer->data != NULL) {
-        buffer->data = realloc(buffer->data, (buffer->size + data_size) * sizeof(char));
+        buffer->data =
+            realloc(buffer->data, (buffer->size + data_size) * sizeof(char));
     } else {
         buffer->data = calloc(data_size, sizeof(char));
     }
@@ -38,10 +37,9 @@ void buffer_add(buffer *buffer, const char *data, size_t data_size)
     buffer->size += data_size;
 }
 
-int buffer_find(buffer *buffer, const char *data, size_t data_size)
-{
-    if (data_size > buffer->size)
-        return -1;
+// cautarea unui buffer prin parcurgerea sa liniara
+int buffer_find(buffer *buffer, const char *data, size_t data_size) {
+    if (data_size > buffer->size) return -1;
 
     size_t last_pos = buffer->size - data_size + 1;
 
@@ -54,17 +52,16 @@ int buffer_find(buffer *buffer, const char *data, size_t data_size)
             }
         }
 
-        if (j == data_size)
-            return i;
+        if (j == data_size) return i;
     }
 
     return -1;
 }
 
-int buffer_find_insensitive(buffer *buffer, const char *data, size_t data_size)
-{
-    if (data_size > buffer->size)
-        return -1;
+// buffer_find varianta case insensitive
+int buffer_find_insensitive(buffer *buffer, const char *data,
+                            size_t data_size) {
+    if (data_size > buffer->size) return -1;
 
     size_t last_pos = buffer->size - data_size + 1;
 
@@ -77,8 +74,7 @@ int buffer_find_insensitive(buffer *buffer, const char *data, size_t data_size)
             }
         }
 
-        if (j == data_size)
-            return i;
+        if (j == data_size) return i;
     }
 
     return -1;

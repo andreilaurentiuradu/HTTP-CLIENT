@@ -4,25 +4,27 @@
 #define BUFLEN 4096
 #define LINELEN 1000
 
-// shows the current error
+// Afiseaza eroarea curenta
 void error(const char *msg);
 
-// adds a line to a string message
+// Adauga o linie la un mesaj de tip string
 void compute_message(char *message, const char *line);
 
-// opens a connection with server host_ip on port portno, returns a socket
-int open_connection(char *host_ip, int portno, int ip_type, int socket_type, int flag);
+// Deschide o conexiune cu serverul host_ip pe portul portno, returneaza un
+// socket
+int open_connection(char *host_ip, int portno, int ip_type, int socket_type,
+                    int flag);
 
-// closes a server connection on socket sockfd
+// Inchide o conexiune server pe socket-ul sockfd
 void close_connection(int sockfd);
 
-// send a message to a server
+// Trimite un mesaj catre un server
 void send_to_server(int sockfd, char *message);
 
-// receives and returns the message from a server
+// Primeste si returneaza mesajul de la un server
 char *receive_from_server(int sockfd);
 
-// extracts and returns a JSON from a server response
+// Extrage si returneaza un JSON din raspunsul serverului
 char *basic_extract_json_response(char *str);
 
 #endif
