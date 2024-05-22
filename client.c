@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
     char *msg;
     char *resp;
     int sockfd;
-    char *token = malloc(3000);
-    char *cookie = malloc(2000);
+    char *token = malloc(300);
+    char *cookie = malloc(200);
     char *code = malloc(3);
     bool entered_in_library = false;
 
@@ -109,13 +109,9 @@ int main(int argc, char *argv[]) {
 
             // succes
             if (strncmp(code, "20", 2) == 0) {
-                printf("doi\n");
-
                 // pastram din raspunsul serverului incepand cu primul cookie
                 char *cookies = strstr(resp, "Set-Cookie: ");
-                printf("cookies:%s\n", cookies);
                 strcpy(cookie, strtok(cookies + strlen("Set-Cookie: "), ";"));
-                printf("cookie:%s", cookie);
                 printf("Utilizator logat cu succes!\n");
             } else {
                 printf("Eroare: Userul nu se poate loga.\n");
@@ -404,8 +400,8 @@ int main(int argc, char *argv[]) {
 
             // succes
             if (strncmp(code, "20", 2) == 0) {
-                token = NULL;
-                cookie = NULL;
+                token = realloc(token, 300);
+                cookie = realloc(cookie, 200);
                 printf("Utilizatorul s-a delogat cu succes!\n");
             } else {
                 printf("Eroare: Delogare nereusita.\n");

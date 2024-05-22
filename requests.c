@@ -139,7 +139,10 @@ char *compute_post_request(char *host, char *url, char *content_type,
     memset(line, 0, LINELEN);
     strcat(message, body_data_buffer);
 
+    // eliberam memoria
     free(line);
     free(body_data_buffer);
+
+    // intoarcem mesajul
     return message;
 }
