@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
     char *msg;
     char *resp;
     int sockfd;
-    char *token = malloc(300);
-    char *cookie = malloc(200);
+    char *token = NULL;
+    char *cookie = NULL;
     char *code = malloc(3);
     bool entered_in_library = false;
 
@@ -67,12 +67,14 @@ int main(int argc, char *argv[]) {
 
             // succes
             if (strncmp(code, "20", 2) == 0) {
-                printf("Utilizator inregistrat cu succes!\n");
+                printf("SUCCES:Utilizator inregistrat cu succes!\n");
             } else {
-                printf("Eroare: User deja inregistrat.\n");
+                printf("EROARE: User deja inregistrat.\n");
             }
         } else if (strncmp("login", task, strlen("login")) == 0) {
             // daca userul vrea sa se logheze
+            token = malloc(300);
+            cookie = malloc(200);
             // ii cerem datele de conectare
             printf("username=");
             scanf("%s", username);
@@ -112,9 +114,9 @@ int main(int argc, char *argv[]) {
                 // pastram din raspunsul serverului incepand cu primul cookie
                 char *cookies = strstr(resp, "Set-Cookie: ");
                 strcpy(cookie, strtok(cookies + strlen("Set-Cookie: "), ";"));
-                printf("Utilizator logat cu succes!\n");
+                printf("SUCCES:Utilizator logat cu succes!\n");
             } else {
-                printf("Eroare: Userul nu se poate loga.\n");
+                printf("EROARE: Userul nu se poate loga.\n");
             }
         } else if (strncmp("enter_library", task, strlen("enter_library")) ==
                    0) {
@@ -138,7 +140,7 @@ int main(int argc, char *argv[]) {
 
             // succes
             if (strncmp(code, "20", 2) == 0) {
-                printf("Utilizatorul are acces la biblioteca.\n");
+                printf("SUCCES:Utilizatorul are acces la biblioteca.\n");
                 entered_in_library = true;
 
                 // stocam incepand cu aparitia tokenului
@@ -149,14 +151,14 @@ int main(int argc, char *argv[]) {
                 // pastram doar tokenul
                 token = strtok(token, "\"");
             } else {
-                printf("Eroare: Acces respins.\n");
+                printf("EROARE: Acces respins.\n");
             }
         } else if (strncmp("get_books", task, strlen("get_books")) == 0) {
             // daca utilizatorul vrea sa vada cartile din biblioteca
 
             if (!entered_in_library) {
                 // daca nu se afla in biblioteca
-                printf("Utilizatorul nu se afla in biblioteca!\n");
+                printf("EROARE:Utilizatorul nu se afla in biblioteca!\n");
                 continue;
             }
 
@@ -181,16 +183,17 @@ int main(int argc, char *argv[]) {
             if (strncmp(code, "20", 2) == 0) {
                 // afisam cartile
                 char *books = strstr(resp, "[{\"");
+                printf("SUCCES:\n");
                 if (books != NULL) {
                     printf("%s\n", books);
                 }
             } else {
-                printf("Eroare: Acces respins.\n");
+                printf("EROARE: Acces respins.\n");
             }
         } else if (strncmp("get_book", task, strlen("get_book")) == 0) {
             // daca utilizatorul doreste datele unei carti cu un id specific
             if (!entered_in_library) {
-                printf("Utilizatorul nu se afla in biblioteca!\n");
+                printf("EROARE:Utilizatorul nu se afla in biblioteca!\n");
                 continue;
             }
 
@@ -208,7 +211,7 @@ int main(int argc, char *argv[]) {
 
             // daca id-ul contine caracter nonnumerice
             if (!id_valid) {
-                printf("Eroare: Id-ul contine caractere interzise.\n");
+                printf("EROARE: Id-ul contine caractere interzise.\n");
                 continue;
             }
 
@@ -237,16 +240,17 @@ int main(int argc, char *argv[]) {
 
             // succes
             if (strncmp(code, "20", 2) == 0) {
+                printf("SUCCES:");
                 printf("%s\n", basic_extract_json_response(resp));
             } else {
-                printf("Eroare: Cartea nu exista.\n");
+                printf("EROARE: Cartea nu exista.\n");
             }
 
         } else if (strncmp("add_book", task, strlen("add_book")) == 0) {
             // daca utilizatorul doreste sa adauge o carte in biblioteca
             if (!entered_in_library) {
                 // daca nu se afla in biblioteca
-                printf("Utilizatorul nu se afla in biblioteca!\n");
+                printf("EROARE:Utilizatorul nu se afla in biblioteca!\n");
                 continue;
             }
             char title[100];
@@ -288,7 +292,7 @@ int main(int argc, char *argv[]) {
             // nu contine alte caractere si nu incepe cu 0
             if (!page_count_valid) {
                 printf(
-                    "Eroare:  Tip de date incorect pentru numarul de "
+                    "EROARE:  Tip de date incorect pentru numarul de "
                     "pagini.\n");
                 continue;
             }
@@ -328,9 +332,9 @@ int main(int argc, char *argv[]) {
 
             // succes
             if (strncmp(code, "20", 2) == 0) {
-                printf("Carte adaugata cu succes!\n");
+                printf("SUCCES:Carte adaugata cu succes!\n");
             } else {
-                printf("Eroare:\n");
+                printf("EROARE:\n");
             }
         } else if (strncmp("delete_book", task, strlen("delete_book")) == 0) {
             char *id2 = malloc(10);
@@ -345,7 +349,7 @@ int main(int argc, char *argv[]) {
                 }
             }
             if (!id_valid2) {
-                printf("Eroare: Id-ul contine caractere interzise.\n");
+                printf("EROARE: Id-ul contine caractere interzise.\n");
                 continue;
             }
 
@@ -372,9 +376,10 @@ int main(int argc, char *argv[]) {
 
             // succes
             if (strncmp(code, "20", 2) == 0) {
-                printf("Cartea cu id-ul %s a fost stearsa cu succes.\n", id2);
+                printf("SUCCES:Cartea cu id-ul %s a fost stearsa cu succes.\n",
+                       id2);
             } else {
-                printf("Eroare: Cartea cu id-ul %s nu exista.\n", id2);
+                printf("EROARE: Cartea cu id-ul %s nu exista.\n", id2);
             }
         } else if (strncmp("logout", task, strlen("logout")) == 0) {
             // daca utilizatorul vrea sa se delogheze
@@ -400,11 +405,11 @@ int main(int argc, char *argv[]) {
 
             // succes
             if (strncmp(code, "20", 2) == 0) {
-                token = realloc(token, 300);
-                cookie = realloc(cookie, 200);
-                printf("Utilizatorul s-a delogat cu succes!\n");
+                token = NULL;
+                cookie = NULL;
+                printf("SUCCES:Utilizatorul s-a delogat cu succes!\n");
             } else {
-                printf("Eroare: Delogare nereusita.\n");
+                printf("EROARE: Delogare nereusita.\n");
             }
         } else if (strncmp("exit", task, strlen("exit")) == 0) {
             // daca utilizatorul vrea sa inchida aplicatia
